@@ -1,113 +1,68 @@
-//
-// Created by Nhat on 02/07/2025.
-//
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
+struct Node {
     int data;
     struct Node* next;
-} Node;
+};
 
-Node* createNode(int value) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    newNode->data = value;
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Loi cap phat bo nho!\n");
+        exit(1);
+    }
+    newNode->data = data;
     newNode->next = NULL;
     return newNode;
 }
 
-void appendNode(Node** head, int value) {
-    Node* newNode = createNode(value);
-    if (*head == NULL) {
-        *head = newNode;
-    } else {
-        Node* temp = *head;
-        while (temp->next != NULL) {
-            temp = temp->next;
-        }
-        temp->next = newNode;
-    }
+void insertAtBeginning(struct Node** head_ref, int data) {
+    struct Node* newNode = createNode(data);
+    newNode->next = *head_ref;
+    *head_ref = newNode;
 }
 
-void prependNode(Node** head, int value) {
-    Node* newNode = createNode(value);
-    newNode->next = *head;
-    *head = newNode;
-}
-
-void printList(Node* head) {
-    Node* temp = head;
-    while (temp != NULL) {
-        printf("%d -> ", temp->data);
-        temp = temp->next;
+void printList(struct Node* node) {
+    printf("Danh sach hien tai: ");
+    while (node != NULL) {
+        printf("%d -> ", node->data);
+        node = node->next;
     }
     printf("NULL\n");
 }
 
-void printDetailedList(Node* head) {
-    Node* temp = head;
-    int count = 1;
-    while (temp != NULL) {
-        printf("Node %d: %d\n", count, temp->data);
-        temp = temp->next;
-        count++;
+void freeList(struct Node* head) {
+    struct Node* tmp;
+    while (head != NULL) {
+        tmp = head;
+        head = head->next;
+        free(tmp);
     }
-}
-
-int searchList(Node* head, int key) {
-    Node* temp = head;
-    while (temp != NULL) {
-        if (temp->data == key) {
-            return 1;
-        }
-        temp = temp->next;
-    }
-    return 0;
-}
-
-int countNodes(Node* head) {
-    int count = 0;
-    Node* temp = head;
-    while (temp != NULL) {
-        count++;
-        temp = temp->next;
-    }
-    return count;
 }
 
 int main() {
-    Node* head = NULL;
-    int searchValue;
-    int newValue;
+    struct Node* head = NULL;
 
-    appendNode(&head, 1);
-    appendNode(&head, 2);
-    appendNode(&head, 3);
-    appendNode(&head, 4);
-    appendNode(&head, 5);
+    head = createNode(30);
+    insertAtBeginning(&head, 20);
+    insertAtBeginning(&head, 10);
 
-    printf("Danh sách liên kết: ");
+    printf("--- TRANG THAI BAN DAU ---\n");
     printList(head);
+    printf("-------------------------\n\n");
 
-    printDetailedList(head);
+    int userInput;
+    printf("Nhap so nguyen ban muon them vao DAU danh sach: ");
+    scanf("%d", &userInput);
 
-    printf("\nNhập số cần tìm: ");
-    scanf("%d", &searchValue);
+    insertAtBeginning(&head, userInput);
 
-    if (searchList(head, searchValue)) {
-        printf("True\n");
-    } else {
-        printf("False\n");
-    }
-
-    printf("\nDanh sách liên kết có %d phần tử\n", countNodes(head));
-
-    printf("\nNhập số muốn thêm vào đầu danh sách: ");
-    scanf("%d", &newValue);
-    prependNode(&head, newValue);
-
-    printf("\nDanh sách sau khi thêm vào đầu: ");
+    printf("\n--- TRANG THAI SAU KHI THEM ---\n");
     printList(head);
+    printf("-----------------------------\n");
+
+    freeList(head);
 
     return 0;
 }

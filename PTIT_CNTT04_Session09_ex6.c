@@ -1,6 +1,3 @@
-//
-// Created by Nhat on 02/07/2025.
-//
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,6 +8,10 @@ typedef struct Node {
 
 Node* createNode(int value) {
     Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Loi cap phat bo nho!\n");
+        exit(1);
+    }
     newNode->data = value;
     newNode->next = NULL;
     return newNode;
@@ -29,17 +30,15 @@ void appendNode(Node** head, int value) {
     }
 }
 
-void prependNode(Node** head, int value) {
-    Node* newNode = createNode(value);
-    newNode->next = *head;
-    *head = newNode;
-}
-
-void deleteFirstNode(Node** head) {
-    if (*head == NULL) return;
-    Node* temp = *head;
-    *head = (*head)->next;
+void deleteFirstNode(Node** head_ref) {
+    if (*head_ref == NULL) {
+        printf("Danh sach rong, khong co gi de xoa.\n");
+        return;
+    }
+    Node* temp = *head_ref;
+    *head_ref = temp->next;
     free(temp);
+    printf("Da xoa thanh cong phan tu dau tien.\n");
 }
 
 void printList(Node* head) {
@@ -51,74 +50,36 @@ void printList(Node* head) {
     printf("NULL\n");
 }
 
-void printDetailedList(Node* head) {
-    Node* temp = head;
-    int count = 1;
-    while (temp != NULL) {
-        printf("Node %d: %d\n", count, temp->data);
-        temp = temp->next;
-        count++;
+void freeList(Node* head) {
+    Node* temp;
+    while (head != NULL) {
+        temp = head;
+        head = head->next;
+        free(temp);
     }
-}
-
-int searchList(Node* head, int key) {
-    Node* temp = head;
-    while (temp != NULL) {
-        if (temp->data == key) {
-            return 1;
-        }
-        temp = temp->next;
-    }
-    return 0;
-}
-
-int countNodes(Node* head) {
-    int count = 0;
-    Node* temp = head;
-    while (temp != NULL) {
-        count++;
-        temp = temp->next;
-    }
-    return count;
 }
 
 int main() {
     Node* head = NULL;
-    int searchValue;
-    int newValue;
 
-    appendNode(&head, 1);
-    appendNode(&head, 2);
-    appendNode(&head, 3);
-    appendNode(&head, 4);
-    appendNode(&head, 5);
+    appendNode(&head, 10);
+    appendNode(&head, 20);
+    appendNode(&head, 30);
+    appendNode(&head, 40);
+    appendNode(&head, 50);
 
-    printf("Danh sách liên kết: ");
+    printf("Danh sach lien ket ban dau: ");
     printList(head);
+    printf("\n");
 
-    printDetailedList(head);
-
-    printf("\nNhập số cần tìm: ");
-    scanf("%d", &searchValue);
-
-    if (searchList(head, searchValue)) {
-        printf("True\n");
-    } else {
-        printf("False\n");
-    }
-
-    printf("\nDanh sách liên kết có %d phần tử\n", countNodes(head));
-
-    printf("\nNhập số muốn thêm vào đầu danh sách: ");
-    scanf("%d", &newValue);
-    prependNode(&head, newValue);
-
-    printf("\nDanh sách sau khi thêm vào đầu: ");
-    printList(head);
-
+    printf("--- Thuc hien xoa phan tu dau ---\n");
     deleteFirstNode(&head);
-    printf("\nDanh sách sau khi xóa phần tử đầu: ");
+    printf("---------------------------------\n\n");
+
+    printf("Danh sach lien ket sau khi xoa: ");
     printList(head);
+
+    freeList(head);
 
     return 0;
 }

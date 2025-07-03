@@ -8,6 +8,10 @@ typedef struct Node {
 
 Node* createNode(int value) {
     Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Loi cap phat bo nho!\n");
+        exit(1);
+    }
     newNode->data = value;
     newNode->next = NULL;
     return newNode;
@@ -26,49 +30,34 @@ void appendNode(Node** head, int value) {
     }
 }
 
-void prependNode(Node** head, int value) {
-    Node* newNode = createNode(value);
-    newNode->next = *head;
-    *head = newNode;
-}
-
-void insertAtPosition(Node** head, int value, int position) {
-    if (position <= 0) return;
-    if (position == 1) {
-        prependNode(head, value);
+void deleteAtPosition(Node** head_ref, int position) {
+    if (*head_ref == NULL) {
+        printf("Danh sach rong, khong co gi de xoa.\n");
         return;
     }
-    Node* newNode = createNode(value);
-    Node* temp = *head;
-    for (int i = 1; i < position - 1 && temp != NULL; i++) {
-        temp = temp->next;
-    }
-    if (temp == NULL) return;
-    newNode->next = temp->next;
-    temp->next = newNode;
-}
 
-void deleteFirstNode(Node** head) {
-    if (*head == NULL) return;
-    Node* temp = *head;
-    *head = (*head)->next;
-    free(temp);
-}
+    Node* temp = *head_ref;
 
-void deleteAtPosition(Node** head, int position) {
-    if (*head == NULL || position <= 0) return;
-    if (position == 1) {
-        deleteFirstNode(head);
+    if (position == 0) {
+        *head_ref = temp->next;
+        free(temp);
+        printf("Da xoa thanh cong phan tu tai vi tri %d.\n", position);
         return;
     }
-    Node* temp = *head;
-    for (int i = 1; i < position - 1 && temp->next != NULL; i++) {
+
+    for (int i = 0; temp != NULL && i < position - 1; i++) {
         temp = temp->next;
     }
-    if (temp->next == NULL) return;
-    Node* toDelete = temp->next;
-    temp->next = toDelete->next;
-    free(toDelete);
+
+    if (temp == NULL || temp->next == NULL) {
+        printf("Vi tri %d khong ton tai trong danh sach.\n", position);
+        return;
+    }
+
+    Node* node_to_delete = temp->next;
+    temp->next = node_to_delete->next;
+    free(node_to_delete);
+    printf("Da xoa thanh cong phan tu tai vi tri %d.\n", position);
 }
 
 void printList(Node* head) {
@@ -80,92 +69,39 @@ void printList(Node* head) {
     printf("NULL\n");
 }
 
-void printDetailedList(Node* head) {
-    Node* temp = head;
-    int count = 1;
-    while (temp != NULL) {
-        printf("Node %d: %d\n", count, temp->data);
-        temp = temp->next;
-        count++;
+void freeList(Node* head) {
+    Node* temp;
+    while (head != NULL) {
+        temp = head;
+        head = head->next;
+        free(temp);
     }
-}
-
-int searchList(Node* head, int key) {
-    Node* temp = head;
-    while (temp != NULL) {
-        if (temp->data == key) {
-            return 1;
-        }
-        temp = temp->next;
-    }
-    return 0;
-}
-
-int countNodes(Node* head) {
-    int count = 0;
-    Node* temp = head;
-    while (temp != NULL) {
-        count++;
-        temp = temp->next;
-    }
-    return count;
 }
 
 int main() {
     Node* head = NULL;
-    int searchValue;
-    int newValue;
-    int insertValue, insertPos;
-    int deletePos;
+    int position;
 
-    appendNode(&head, 1);
-    appendNode(&head, 2);
-    appendNode(&head, 3);
-    appendNode(&head, 4);
-    appendNode(&head, 5);
+    appendNode(&head, 10);
+    appendNode(&head, 20);
+    appendNode(&head, 30);
+    appendNode(&head, 40);
+    appendNode(&head, 50);
 
-    printf("Danh sách liên kết: ");
+    printf("Danh sach lien ket ban dau: ");
+    printList(head);
+    printf("\n");
+
+    printf("Nhap vi tri muon xoa (bat dau tu 0): ");
+    scanf("%d", &position);
+    printf("\n");
+
+    deleteAtPosition(&head, position);
+
+    printf("\nDanh sach lien ket sau khi xoa: ");
     printList(head);
 
-    printDetailedList(head);
-
-    printf("\nNhập số cần tìm: ");
-    scanf("%d", &searchValue);
-
-    if (searchList(head, searchValue)) {
-        printf("True\n");
-    } else {
-        printf("False\n");
-    }
-
-    printf("\nDanh sách liên kết có %d phần tử\n", countNodes(head));
-
-    printf("\nNhập số muốn thêm vào đầu danh sách: ");
-    scanf("%d", &newValue);
-    prependNode(&head, newValue);
-
-    printf("\nDanh sách sau khi thêm vào đầu: ");
-    printList(head);
-
-    deleteFirstNode(&head);
-    printf("\nDanh sách sau khi xóa phần tử đầu: ");
-    printList(head);
-
-    printf("\nNhập giá trị muốn chèn: ");
-    scanf("%d", &insertValue);
-    printf("Nhập vị trí muốn chèn: ");
-    scanf("%d", &insertPos);
-    insertAtPosition(&head, insertValue, insertPos);
-
-    printf("\nDanh sách sau khi chèn vào vị trí %d: ", insertPos);
-    printList(head);
-
-    printf("\nNhập vị trí muốn xóa: ");
-    scanf("%d", &deletePos);
-    deleteAtPosition(&head, deletePos);
-
-    printf("\nDanh sách sau khi xóa tại vị trí %d: ", deletePos);
-    printList(head);
+    freeList(head);
 
     return 0;
 }
